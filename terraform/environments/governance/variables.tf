@@ -39,6 +39,12 @@ variable "prod_account_id" {
   type        = string
 }
 
+variable "tooling_account_id" {
+  description = "Tooling (CICD) Account ID"
+  type        = string
+  default     = ""
+}
+
 # =============================================================================
 # Regional Configuration
 # =============================================================================
@@ -144,3 +150,38 @@ variable "prod_remediation_allowlist" {
     "AWS::S3::Bucket" # Only S3 public access remediation allowed in prod
   ]
 }
+
+# =============================================================================
+# Slack Integration
+# =============================================================================
+
+variable "slack_webhook_url" {
+  description = "Slack Incoming Webhook URL for notifications"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "enable_slack" {
+  description = "Enable Slack notifications"
+  type        = bool
+  default     = false
+}
+
+# =============================================================================
+# API Gateway Custom Domain
+# =============================================================================
+
+variable "api_domain_name" {
+  description = "Custom domain for API Gateway (e.g., api.my-projects-aws.site)"
+  type        = string
+  default     = ""
+}
+
+variable "hosted_zone_id" {
+  description = "Route 53 Hosted Zone ID for the API domain"
+  type        = string
+  default     = ""
+}
+
+

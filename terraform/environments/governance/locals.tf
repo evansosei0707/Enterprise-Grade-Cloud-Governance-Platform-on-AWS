@@ -44,6 +44,9 @@ locals {
   # DynamoDB table names
   compliance_table_name = "${var.project_name}-compliance-history"
   terraform_lock_table  = "${var.project_name}-terraform-locks"
+  
+  # Terraform state bucket (for drift detection)
+  tf_state_bucket = "${var.project_name}-terraform-state-${var.governance_account_id}"
 
   # =========================================================================
   # IAM ARNs

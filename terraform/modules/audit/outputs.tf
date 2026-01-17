@@ -22,6 +22,16 @@ output "table_name" {
   value       = aws_dynamodb_table.compliance_history.id
 }
 
+output "exceptions_table_arn" {
+  description = "ARN of the DynamoDB compliance exceptions table"
+  value       = aws_dynamodb_table.compliance_exceptions.arn
+}
+
+output "exceptions_table_name" {
+  description = "Name of the DynamoDB compliance exceptions table"
+  value       = aws_dynamodb_table.compliance_exceptions.id
+}
+
 output "log_group_arns" {
   description = "ARNs of the CloudWatch log groups"
   value = {
@@ -35,3 +45,4 @@ output "dashboard_name" {
   description = "Name of the CloudWatch dashboard"
   value       = aws_cloudwatch_dashboard.governance.dashboard_name
 }
+

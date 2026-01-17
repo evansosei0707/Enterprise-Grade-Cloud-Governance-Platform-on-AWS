@@ -23,9 +23,12 @@ resource "aws_lambda_function" "remediation_engine" {
 
   environment {
     variables = {
-      REMEDIATION_ROLE_NAME = var.remediation_role_name
-      EXTERNAL_ID           = var.external_id
-      LOG_LEVEL             = var.log_level
+      REMEDIATION_ROLE_NAME   = var.remediation_role_name
+      EXTERNAL_ID             = var.external_id
+      LOG_LEVEL               = var.log_level
+      ACCOUNT_ENVIRONMENT_MAP = jsonencode(var.account_environment_map)
+      PROD_ACCOUNT_ID         = var.prod_account_id
+      NOTIFICATION_LAMBDA     = var.notification_lambda_arn
     }
   }
 
@@ -93,3 +96,26 @@ data "aws_iam_policy_document" "assume_cross_account_role" {
     resources = ["arn:aws:iam::*:role/${var.remediation_role_name}"]
   }
 }
+
+# Permission to invoke notification Lambda for production safety fallback
+resource "aws_iam_role_policy" "invoke_notification_lambda" {
+  count = var.notification_lambda_arn != "" ? 1 : 0
+
+  name   = "${var.name_prefix}-invoke-notification"
+  role   = aws_iam_role.remediation_engine.id
+  policy = data.aws_iam_policy_document.invoke_notification_lambda[0].json
+}
+
+data "aws_iam_policy_document" "invoke_notification_lambda" {
+  count = var.notification_lambda_arn != "" ? 1 : 0
+
+  statement {
+    sid    = "InvokeNotificationLambda"
+    effect = "Allow"
+    actions = [
+      "lambda:InvokeFunction"
+    ]
+    resources = [var.notification_lambda_arn]
+  }
+}
+

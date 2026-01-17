@@ -24,6 +24,7 @@ resource "aws_lambda_function" "policy_engine" {
   environment {
     variables = {
       DYNAMODB_TABLE        = var.dynamodb_table_name
+      EXCEPTIONS_TABLE      = var.exceptions_table_name
       REMEDIATION_LAMBDA    = var.remediation_lambda_arn
       NOTIFICATION_LAMBDA   = var.notification_lambda_arn
       ENVIRONMENT           = var.environment
@@ -104,6 +105,23 @@ data "aws_iam_policy_document" "dynamodb_access" {
       "dynamodb:UpdateItem"
     ]
     resources = [var.dynamodb_table_arn]
+  }
+
+  # Read access to exceptions table for whitelist checking
+  dynamic "statement" {
+    for_each = var.exceptions_table_arn != "" ? [1] : []
+    content {
+      sid    = "ExceptionsTableRead"
+      effect = "Allow"
+      actions = [
+        "dynamodb:GetItem",
+        "dynamodb:Query"
+      ]
+      resources = [
+        var.exceptions_table_arn,
+        "${var.exceptions_table_arn}/index/*"
+      ]
+    }
   }
 }
 

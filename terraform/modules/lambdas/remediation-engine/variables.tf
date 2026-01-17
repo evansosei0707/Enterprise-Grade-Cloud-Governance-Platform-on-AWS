@@ -23,8 +23,27 @@ variable "log_level" {
   default     = "INFO"
 }
 
+variable "account_environment_map" {
+  description = "Map of account IDs to environment names (e.g., dev, staging, prod, governance, tooling)"
+  type        = map(string)
+  default     = {}
+}
+
+variable "prod_account_id" {
+  description = "Production account ID for safety checks (blocks SG remediation in prod)"
+  type        = string
+  default     = ""
+}
+
+variable "notification_lambda_arn" {
+  description = "ARN of the notification Lambda for prod safety fallback"
+  type        = string
+  default     = ""
+}
+
 variable "tags" {
   description = "Tags to apply to all resources"
   type        = map(string)
   default     = {}
 }
+

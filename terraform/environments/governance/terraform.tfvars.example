@@ -1,6 +1,42 @@
-organization_id       = "o-xxxxxxxxxx"
-management_account_id = "123456789012"
-governance_account_id = "123456789012"
-dev_account_id        = "123456789012"
-staging_account_id    = "123456789012"
-prod_account_id       = "123456789012"
+# =============================================================================
+# Governance Environment - terraform.tfvars.example
+# =============================================================================
+# Copy this file to terraform.tfvars and fill in your values:
+#   cp terraform.tfvars.example terraform.tfvars
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# AWS Organization & Account IDs
+# -----------------------------------------------------------------------------
+# Get your organization ID from AWS Organizations console
+organization_id = "o-xxxxxxxxxx"
+
+# Your AWS account IDs (12-digit numbers)
+management_account_id = "123456789012"  # AWS Organizations management account
+governance_account_id = "123456789012"  # Where this governance platform runs
+dev_account_id        = "123456789012"  # Development workload account
+staging_account_id    = "123456789012"  # Staging workload account
+prod_account_id       = "123456789012"  # Production workload account
+tooling_account_id    = "123456789012"  # Shared tooling account (optional)
+
+# -----------------------------------------------------------------------------
+# Slack Integration (Optional)
+# -----------------------------------------------------------------------------
+# Get webhook URL from: https://api.slack.com/messaging/webhooks
+# Leave empty or set enable_slack = false to disable
+slack_webhook_url = ""
+enable_slack      = false
+
+# -----------------------------------------------------------------------------
+# API Gateway Custom Domain (Optional - Path B Feature)
+# -----------------------------------------------------------------------------
+# If you want a custom domain for the Dashboard API:
+# 1. Register a domain (e.g., via Route 53 or Namecheap)
+# 2. Create a Route 53 hosted zone for it
+# 3. Fill in these values
+
+# Your custom API subdomain (e.g., api.yourdomain.com)
+api_domain_name = ""
+
+# Route 53 hosted zone ID (from Route 53 console)
+hosted_zone_id = ""

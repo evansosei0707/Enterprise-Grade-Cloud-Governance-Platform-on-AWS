@@ -57,9 +57,11 @@ module "audit" {
 module "notification" {
   source = "../../modules/lambdas/notification"
 
-  name_prefix   = local.name_prefix
-  sns_topic_arn = aws_sns_topic.alerts.arn
-  tags          = local.common_tags
+  name_prefix       = local.name_prefix
+  sns_topic_arn     = aws_sns_topic.alerts.arn
+  slack_webhook_url = var.slack_webhook_url
+  enable_slack      = var.enable_slack
+  tags              = local.common_tags
 }
 
 resource "aws_sns_topic" "alerts" {
@@ -78,9 +80,23 @@ module "remediation_engine" {
 
   name_prefix           = local.name_prefix
   remediation_role_name = var.remediation_role_name
-  external_id           = "CloudGovernance-Remediation-2024" # Should be a secret
+  external_id           = "CloudGovernance-Remediation-2024"
   log_level             = "INFO"
-  tags                  = local.common_tags
+  
+  # Account-to-environment mapping for environment-aware tagging
+  account_environment_map = {
+    (var.governance_account_id) = "governance"
+    (var.dev_account_id)        = "dev"
+    (var.staging_account_id)    = "staging"
+    (var.prod_account_id)       = "prod"
+    (var.tooling_account_id)    = "tooling"
+  }
+  
+  # Production safety: blocks SG remediation in prod
+  prod_account_id         = var.prod_account_id
+  notification_lambda_arn = module.notification.function_arn
+  
+  tags = local.common_tags
 }
 
 module "policy_engine" {
@@ -90,6 +106,8 @@ module "policy_engine" {
   environment             = "governance"
   dynamodb_table_name     = module.audit.table_name
   dynamodb_table_arn      = module.audit.table_arn
+  exceptions_table_name   = module.audit.exceptions_table_name
+  exceptions_table_arn    = module.audit.exceptions_table_arn
   remediation_lambda_arn  = module.remediation_engine.function_arn
   notification_lambda_arn = module.notification.function_arn
   log_level               = "INFO"
@@ -104,4 +122,46 @@ module "eventbridge" {
   policy_engine_lambda_name = module.policy_engine.function_name
   organization_id           = var.organization_id # Needed for cross-account access
   tags                      = local.common_tags
+}
+
+# =============================================================================
+# Dashboard API (Path B)
+# =============================================================================
+
+module "dashboard_api" {
+  source = "../../modules/lambdas/dashboard-api"
+
+  name_prefix           = local.name_prefix
+  compliance_table_name = module.audit.table_name
+  compliance_table_arn  = module.audit.table_arn
+  exceptions_table_name = module.audit.exceptions_table_name
+  exceptions_table_arn  = module.audit.exceptions_table_arn
+  log_level             = "INFO"
+  tags                  = local.common_tags
+}
+
+# API Gateway with Custom Domain
+module "api_gateway" {
+  source = "../../modules/api-gateway"
+
+  name_prefix          = local.name_prefix
+  domain_name          = var.api_domain_name
+  hosted_zone_id       = var.hosted_zone_id
+  lambda_invoke_arn    = module.dashboard_api.invoke_arn
+  lambda_function_name = module.dashboard_api.function_name
+  stage_name           = "v1"
+  tags                 = local.common_tags
+}
+
+# Drift Detection (Daily at 7pm UTC)
+module "drift_detection" {
+  source = "../../modules/drift-detection"
+
+  name_prefix             = local.name_prefix
+  tf_state_bucket         = local.tf_state_bucket
+  tf_state_key            = "governance/terraform.tfstate"
+  notification_lambda_arn = module.notification.function_arn
+  schedule_expression     = "cron(0 19 * * ? *)"  # 7pm UTC daily
+  log_level               = "INFO"
+  tags                    = local.common_tags
 }

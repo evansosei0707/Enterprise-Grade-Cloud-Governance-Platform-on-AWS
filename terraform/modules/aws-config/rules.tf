@@ -73,6 +73,26 @@ resource "aws_config_config_rule" "s3_bucket_public_write_prohibited" {
   tags = var.tags
 }
 
+# NEW: Enforce Block Public Access is always enabled (Governance Standard)
+resource "aws_config_config_rule" "s3_bucket_level_public_access_prohibited" {
+  name        = "s3-bucket-level-public-access-prohibited"
+  description = "Checks that S3 buckets have Block Public Access settings enabled at the bucket level"
+
+  source {
+    owner             = "AWS"
+    source_identifier = "S3_BUCKET_LEVEL_PUBLIC_ACCESS_PROHIBITED"
+  }
+
+  scope {
+    compliance_resource_types = ["AWS::S3::Bucket"]
+  }
+
+  depends_on = [aws_config_configuration_recorder.main]
+
+  tags = var.tags
+}
+
+
 # =============================================================================
 # Security Rules - Network
 # =============================================================================

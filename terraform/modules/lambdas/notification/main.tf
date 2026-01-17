@@ -1,12 +1,12 @@
 # -----------------------------------------------------------------------------
 # Notification Lambda Module - Main Configuration
 # -----------------------------------------------------------------------------
-# Creates a Lambda function to format and send notifications via SNS.
+# Creates a Lambda function to format and send notifications via SNS and Slack.
 # -----------------------------------------------------------------------------
 
 resource "aws_lambda_function" "notification" {
   function_name = "${var.name_prefix}-notification"
-  description   = "Sends notifications for compliance events"
+  description   = "Sends notifications for compliance events via SNS and Slack"
   role          = aws_iam_role.notification.arn
   handler       = "handler.lambda_handler"
   runtime       = "python3.11"
@@ -18,7 +18,9 @@ resource "aws_lambda_function" "notification" {
 
   environment {
     variables = {
-      SNS_TOPIC_ARN = var.sns_topic_arn
+      SNS_TOPIC_ARN     = var.sns_topic_arn
+      SLACK_WEBHOOK_URL = var.slack_webhook_url
+      ENABLE_SLACK      = var.enable_slack ? "true" : "false"
     }
   }
 

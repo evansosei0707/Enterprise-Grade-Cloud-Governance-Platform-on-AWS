@@ -1,0 +1,48 @@
+# =============================================================================
+# CI/CD Pipeline - terraform.tfvars.example
+# =============================================================================
+# Copy this file to terraform.tfvars and fill in your values:
+#   cp terraform.tfvars.example terraform.tfvars
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Resource Naming
+# -----------------------------------------------------------------------------
+name_prefix = "cloud-governance"
+
+# -----------------------------------------------------------------------------
+# GitHub Repository
+# -----------------------------------------------------------------------------
+# Your GitHub repository URL (must be connected via CodeStar Connections)
+github_repo   = "https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git"
+github_branch = "main"
+
+# -----------------------------------------------------------------------------
+# AWS Account IDs
+# -----------------------------------------------------------------------------
+governance_account_id = "123456789012"  # Where CI/CD runs
+dev_account_id        = "123456789012"
+staging_account_id    = "123456789012"
+prod_account_id       = "123456789012"
+
+# -----------------------------------------------------------------------------
+# Terraform State Configuration
+# -----------------------------------------------------------------------------
+# S3 bucket where Terraform state is stored
+tf_state_bucket = "your-terraform-state-bucket-name"
+
+# -----------------------------------------------------------------------------
+# Notifications
+# -----------------------------------------------------------------------------
+# SNS topic ARN for pipeline approval notifications
+# This is created by the governance environment deployment
+notification_topic_arn = "arn:aws:sns:us-east-1:123456789012:cloud-governance-governance-alerts"
+
+# -----------------------------------------------------------------------------
+# Tags (Optional)
+# -----------------------------------------------------------------------------
+tags = {
+  Project     = "CloudGovernance"
+  Environment = "governance"
+  ManagedBy   = "Terraform"
+}

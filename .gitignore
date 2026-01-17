@@ -1,19 +1,52 @@
+# =============================================================================
 # Terraform
-.terraform/
-*.tfstate
-*.tfstate.backup
-*.tfvars
-*.tfplan
-.terraform.lock.hcl
-terraform.tfstate.d/
+# =============================================================================
+**/.terraform/
+**/terraform.tfstate
+**/terraform.tfstate.backup
+**/terraform.tfstate.d/
+**/*.tfplan
+**/.terraform.lock.hcl
 
+# Terraform variables (contain secrets)
+**/*.tfvars
+**/*.auto.tfvars
+
+# IMPORTANT: Keep example files for documentation
+!**/*.tfvars.example
+
+# =============================================================================
 # Python
-__pycache__/
-*.py[cod]
-.pytest_cache/
-venv/
-.env
+# =============================================================================
+**/__pycache__/
+**/*.py[cod]
+**/*.pyo
+**/*.egg-info/
+**/.pytest_cache/
+**/venv/
+**/.env
 
-# IDE
+# Lambda deployment packages (generated during terraform apply)
+**/dist/*.zip
+
+# =============================================================================
+# IDE & Editors
+# =============================================================================
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
+
+# =============================================================================
+# OS Files
+# =============================================================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =============================================================================
+# Logs
+# =============================================================================
+*.log
+logs/

@@ -6,14 +6,19 @@ Processes AWS Config compliance events and routes them based on severity.
 Responsibilities:
 1. Parse Config compliance change events
 2. Identify account, region, resource, and violated rule
-3. Classify severity (LOW, MEDIUM, HIGH)
-4. Persist to DynamoDB
-5. Route to remediation or notification
+3. Check for approved exceptions (whitelist)
+4. Classify severity (LOW, MEDIUM, HIGH)
+5. Persist to DynamoDB
+6. Route to remediation or notification
 
 Severity Classification:
 - LOW: Auto-remediate (missing tags, public S3)
 - MEDIUM: Notify (security group issues)
 - HIGH: Log only (requires manual review)
+
+Exception Management:
+- Resources with approved exceptions are skipped
+- Exceptions must have status="approved" and not be expired
 
 This handler is IDEMPOTENT - safe to retry on the same event.
 """
@@ -23,7 +28,7 @@ import logging
 import os
 import time
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Optional
 
 import boto3
 from botocore.exceptions import ClientError
@@ -39,23 +44,26 @@ lambda_client = boto3.client("lambda")
 
 # Environment variables
 DYNAMODB_TABLE = os.environ.get("DYNAMODB_TABLE", "cloud-governance-compliance-history")
+EXCEPTIONS_TABLE = os.environ.get("EXCEPTIONS_TABLE", "")
 REMEDIATION_LAMBDA = os.environ.get("REMEDIATION_LAMBDA", "")
 NOTIFICATION_LAMBDA = os.environ.get("NOTIFICATION_LAMBDA", "")
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "governance")
 
 # Severity classification mapping
+# LOW = Auto-remediate, MEDIUM = Notify, HIGH = Log only
 RULE_SEVERITY = {
-    # LOW - Auto-remediate
+    # LOW - Auto-remediate (non-prod only for SG, all envs for S3/tags)
     "required-tags": "LOW",
     "s3-bucket-public-read-prohibited": "LOW",
+    "s3-bucket-level-public-access-prohibited": "LOW",  # Enforce BPA always ON
+    "restricted-ssh": "LOW",      # Auto-remediate open SSH (prod safety in remediation engine)
+    "restricted-rdp": "LOW",      # Auto-remediate open RDP (prod safety in remediation engine)
     
     # MEDIUM - Notify
     "s3-bucket-public-write-prohibited": "MEDIUM",
-    "restricted-ssh": "MEDIUM",
-    "restricted-rdp": "MEDIUM",
     "restricted-common-ports": "MEDIUM",
     
-    # HIGH - Log only
+    # HIGH - Log only (manual review required)
     "ec2-instance-managed-by-ssm": "HIGH",
     "iam-user-mfa-enabled": "HIGH",
     "root-account-mfa-enabled": "HIGH",
@@ -86,6 +94,33 @@ def lambda_handler(event: dict, context: Any) -> dict:
         if compliance_data["compliance_type"] != "NON_COMPLIANT":
             logger.info(f"Resource {compliance_data['resource_id']} is COMPLIANT, skipping")
             return {"statusCode": 200, "body": "Skipped - resource is compliant"}
+        
+        # Check for approved exception (whitelist)
+        exception = check_exception(
+            account_id=compliance_data["account_id"],
+            resource_id=compliance_data["resource_id"],
+            rule_name=compliance_data["rule_name"]
+        )
+        
+        if exception:
+            logger.info(
+                f"Resource {compliance_data['resource_id']} has approved exception for "
+                f"rule {compliance_data['rule_name']}. Reason: {exception.get('reason', 'N/A')}. "
+                f"Approved by: {exception.get('approved_by', 'N/A')}. Skipping."
+            )
+            # Still persist the record but mark as excepted
+            compliance_data["exception_applied"] = True
+            compliance_data["exception_reason"] = exception.get("reason", "")
+            persist_compliance_record(compliance_data)
+            
+            return {
+                "statusCode": 200,
+                "body": json.dumps({
+                    "message": "Skipped - approved exception exists",
+                    "exception_reason": exception.get("reason", ""),
+                    "approved_by": exception.get("approved_by", "")
+                })
+            }
         
         # Classify severity
         severity = classify_severity(compliance_data["rule_name"])
@@ -121,6 +156,50 @@ def lambda_handler(event: dict, context: Any) -> dict:
     except Exception as e:
         logger.error(f"Error processing event: {str(e)}", exc_info=True)
         raise
+
+
+def check_exception(account_id: str, resource_id: str, rule_name: str) -> Optional[dict]:
+    """
+    Check if an approved exception exists for this resource and rule.
+    
+    Returns:
+        Exception record dict if approved and not expired, None otherwise
+    """
+    if not EXCEPTIONS_TABLE:
+        logger.debug("Exceptions table not configured, skipping check")
+        return None
+    
+    try:
+        table = dynamodb.Table(EXCEPTIONS_TABLE)
+        pk = f"EXCEPTION#{account_id}#{resource_id}"
+        sk = f"RULE#{rule_name}"
+        
+        response = table.get_item(
+            Key={"pk": pk, "sk": sk}
+        )
+        
+        item = response.get("Item")
+        if not item:
+            return None
+        
+        # Check if exception is approved
+        if item.get("status") != "approved":
+            logger.debug(f"Exception found but status is {item.get('status')}, not approved")
+            return None
+        
+        # Check if exception is expired (TTL is handled by DynamoDB, but double-check)
+        expires_at = item.get("expires_at")
+        if expires_at:
+            # expires_at is stored as epoch timestamp
+            if int(expires_at) < int(time.time()):
+                logger.debug(f"Exception found but expired at {expires_at}")
+                return None
+        
+        return item
+        
+    except ClientError as e:
+        logger.error(f"Error checking exception: {e}")
+        return None
 
 
 def parse_compliance_event(event: dict) -> dict | None:
@@ -190,12 +269,17 @@ def persist_compliance_record(data: dict) -> None:
         "resource_type": data["resource_type"],
         "rule_name": data["rule_name"],
         "compliance_type": data["compliance_type"],
-        "severity": data["severity"],
-        "annotation": data["annotation"],
+        "severity": data.get("severity", "UNKNOWN"),
+        "annotation": data.get("annotation", ""),
         "event_id": data["event_id"],
         "processed_at": datetime.now(timezone.utc).isoformat(),
         "ttl": ttl,
     }
+    
+    # Add exception info if present
+    if data.get("exception_applied"):
+        item["exception_applied"] = True
+        item["exception_reason"] = data.get("exception_reason", "")
     
     try:
         # Use condition to prevent duplicate processing
