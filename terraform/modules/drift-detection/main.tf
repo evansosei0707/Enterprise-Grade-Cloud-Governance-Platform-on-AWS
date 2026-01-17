@@ -11,7 +11,7 @@ resource "aws_lambda_function" "drift_detection" {
   role          = aws_iam_role.drift_detection.arn
   handler       = "handler.lambda_handler"
   runtime       = "python3.11"
-  timeout       = 300  # 5 minutes for full scan
+  timeout       = 300 # 5 minutes for full scan
   memory_size   = 512
 
   filename         = data.archive_file.drift_detection.output_path
@@ -19,10 +19,10 @@ resource "aws_lambda_function" "drift_detection" {
 
   environment {
     variables = {
-      TF_STATE_BUCKET      = var.tf_state_bucket
-      TF_STATE_KEY         = var.tf_state_key
-      NOTIFICATION_LAMBDA  = var.notification_lambda_arn
-      LOG_LEVEL            = var.log_level
+      TF_STATE_BUCKET     = var.tf_state_bucket
+      TF_STATE_KEY        = var.tf_state_key
+      NOTIFICATION_LAMBDA = var.notification_lambda_arn
+      LOG_LEVEL           = var.log_level
     }
   }
 

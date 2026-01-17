@@ -35,7 +35,7 @@ resource "aws_cloudwatch_event_target" "policy_engine" {
 
   # Retry policy for failed invocations
   retry_policy {
-    maximum_event_age_in_seconds = 3600  # 1 hour
+    maximum_event_age_in_seconds = 3600 # 1 hour
     maximum_retry_attempts       = 3
   }
 

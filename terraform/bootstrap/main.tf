@@ -15,7 +15,7 @@ provider "aws" {
 # =============================================================================
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "cloud-governance-terraform-state-257016720202"
-  
+
   # Prevent accidental deletion
   lifecycle {
     prevent_destroy = true

@@ -8,7 +8,7 @@ locals {
   # =========================================================================
   # Account Mappings
   # =========================================================================
-  
+
   # Map of all member accounts (excludes management)
   member_accounts = {
     governance = var.governance_account_id
@@ -33,7 +33,7 @@ locals {
   # =========================================================================
   # Resource Naming
   # =========================================================================
-  
+
   # Standard naming prefix
   name_prefix = "${var.project_name}-${var.environment}"
 
@@ -44,14 +44,14 @@ locals {
   # DynamoDB table names
   compliance_table_name = "${var.project_name}-compliance-history"
   terraform_lock_table  = "${var.project_name}-terraform-locks"
-  
+
   # Terraform state bucket (for drift detection)
   tf_state_bucket = "${var.project_name}-terraform-state-${var.governance_account_id}"
 
   # =========================================================================
   # IAM ARNs
   # =========================================================================
-  
+
   # Governance account Lambda execution role ARN pattern
   lambda_role_arn_prefix = "arn:aws:iam::${var.governance_account_id}:role/${local.name_prefix}"
 
@@ -64,7 +64,7 @@ locals {
   # =========================================================================
   # Config Rules Configuration
   # =========================================================================
-  
+
   # Tagging rules configuration
   tagging_rules = {
     required_tags = {
@@ -92,27 +92,27 @@ locals {
   # =========================================================================
   # Severity Classification
   # =========================================================================
-  
+
   # Map Config rule names to severity levels
   rule_severity = {
     # LOW - Auto-remediate
     "required-tags"                    = "LOW"
     "s3-bucket-public-read-prohibited" = "LOW"
-    
+
     # MEDIUM - Notify
     "s3-bucket-public-write-prohibited" = "MEDIUM"
     "restricted-ssh"                    = "MEDIUM"
     "restricted-common-ports"           = "MEDIUM"
-    
+
     # HIGH - Log only (manual review required)
-    "ec2-instance-managed-by-ssm"       = "HIGH"
-    "iam-user-mfa-enabled"              = "HIGH"
+    "ec2-instance-managed-by-ssm" = "HIGH"
+    "iam-user-mfa-enabled"        = "HIGH"
   }
 
   # =========================================================================
   # EventBridge Patterns
   # =========================================================================
-  
+
   config_compliance_event_pattern = jsonencode({
     source      = ["aws.config"]
     detail-type = ["Config Rules Compliance Change"]
@@ -124,7 +124,7 @@ locals {
   # =========================================================================
   # Common Tags with Environment Override
   # =========================================================================
-  
+
   common_tags = merge(var.default_tags, {
     Environment = var.environment
     UpdatedAt   = timestamp()

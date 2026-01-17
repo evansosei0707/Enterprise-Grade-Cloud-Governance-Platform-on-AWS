@@ -33,7 +33,7 @@ resource "random_id" "suffix" {
 # -----------------------------------------------------------------------------
 resource "aws_s3_bucket" "bad_bucket" {
   bucket = "non-compliant-bucket-${var.target_account}-${random_id.suffix.hex}"
-  
+
   # INTENTIONAL: No tags (Violates required-tags rule)
 }
 
@@ -68,7 +68,7 @@ resource "aws_s3_bucket_ownership_controls" "bad_bucket" {
 resource "aws_security_group" "bad_sg" {
   name        = "non-compliant-sg-${var.target_account}"
   description = "Security group with open SSH/RDP"
-  
+
   # INTENTIONAL: No tags
 }
 

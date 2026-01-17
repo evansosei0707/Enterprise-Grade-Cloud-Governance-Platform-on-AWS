@@ -15,7 +15,7 @@ resource "aws_config_configuration_recorder" "main" {
 
   recording_group {
     all_supported = true
-    
+
     # Include global resources (IAM, CloudFront, etc.)
     include_global_resource_types = var.include_global_resources
 

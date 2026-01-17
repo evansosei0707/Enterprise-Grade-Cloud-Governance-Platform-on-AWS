@@ -22,7 +22,7 @@ resource "aws_codestarconnections_connection" "github" {
 
 resource "aws_s3_bucket" "artifacts" {
   bucket = "${var.name_prefix}-pipeline-artifacts"
-  
+
   tags = var.tags
 }
 

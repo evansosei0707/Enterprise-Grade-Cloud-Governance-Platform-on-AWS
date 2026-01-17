@@ -12,7 +12,7 @@ terraform {
     region         = "us-east-1"
     encrypt        = true
     dynamodb_table = "cloud-governance-terraform-locks"
-    
+
     # Assume role into governance account for state access
     role_arn = "arn:aws:iam::257016720202:role/TerraformExecutionRole"
   }

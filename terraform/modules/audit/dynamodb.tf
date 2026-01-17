@@ -11,9 +11,9 @@
 
 resource "aws_dynamodb_table" "compliance_history" {
   name         = var.table_name
-  billing_mode = "PAY_PER_REQUEST"  # On-demand for variable workloads
-  hash_key     = "pk"               # Partition key: ACCOUNT#<id>#RESOURCE#<id>
-  range_key    = "sk"               # Sort key: TIMESTAMP#<ts>
+  billing_mode = "PAY_PER_REQUEST" # On-demand for variable workloads
+  hash_key     = "pk"              # Partition key: ACCOUNT#<id>#RESOURCE#<id>
+  range_key    = "sk"              # Sort key: TIMESTAMP#<ts>
 
   # Primary key attributes
   attribute {
@@ -84,8 +84,8 @@ resource "aws_dynamodb_table" "compliance_history" {
 resource "aws_dynamodb_table" "compliance_exceptions" {
   name         = "${var.table_name}-exceptions"
   billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "pk"  # EXCEPTION#<account_id>#<resource_id>
-  range_key    = "sk"  # RULE#<rule_name>
+  hash_key     = "pk" # EXCEPTION#<account_id>#<resource_id>
+  range_key    = "sk" # RULE#<rule_name>
 
   attribute {
     name = "pk"

@@ -20,10 +20,10 @@ module "aws_config" {
   governance_event_bus_arn   = "arn:aws:events:us-east-1:257016720202:event-bus/default"
   s3_key_prefix              = null # Config Service automatically appends AWSLogs/<account_id>/Config
 
-  
+
   include_global_resources = false # Only capture global in one account (Governance/Prod) usually, or all if desired.
-                                   # Here we disable for Dev to reduce noise/cost, or enable if strictly required.
-                                   # Let's keep false for Dev, true for Prod/Governance.
+  # Here we disable for Dev to reduce noise/cost, or enable if strictly required.
+  # Let's keep false for Dev, true for Prod/Governance.
 
   tags = merge(local.common_tags, { Environment = "dev" })
 }

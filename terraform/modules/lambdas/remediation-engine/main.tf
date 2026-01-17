@@ -15,7 +15,7 @@ resource "aws_lambda_function" "remediation_engine" {
   role          = aws_iam_role.remediation_engine.arn
   handler       = "handler.lambda_handler"
   runtime       = "python3.11"
-  timeout       = 300  # Remediation might take longer
+  timeout       = 300 # Remediation might take longer
   memory_size   = 256
 
   filename         = data.archive_file.remediation_engine.output_path

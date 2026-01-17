@@ -17,7 +17,7 @@ module "aws_config" {
   central_config_bucket_arn  = "arn:aws:s3:::cloud-governance-audit-${var.governance_account_id}"
   governance_event_bus_arn   = "arn:aws:events:us-east-1:257016720202:event-bus/default"
   s3_key_prefix              = null
-  include_global_resources   = false 
+  include_global_resources   = false
 
   tags = merge(local.common_tags, { Environment = "staging" })
 }

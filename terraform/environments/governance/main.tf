@@ -82,7 +82,7 @@ module "remediation_engine" {
   remediation_role_name = var.remediation_role_name
   external_id           = "CloudGovernance-Remediation-2024"
   log_level             = "INFO"
-  
+
   # Account-to-environment mapping for environment-aware tagging
   account_environment_map = {
     (var.governance_account_id) = "governance"
@@ -91,11 +91,11 @@ module "remediation_engine" {
     (var.prod_account_id)       = "prod"
     (var.tooling_account_id)    = "tooling"
   }
-  
+
   # Production safety: blocks SG remediation in prod
   prod_account_id         = var.prod_account_id
   notification_lambda_arn = module.notification.function_arn
-  
+
   tags = local.common_tags
 }
 
@@ -161,7 +161,7 @@ module "drift_detection" {
   tf_state_bucket         = local.tf_state_bucket
   tf_state_key            = "governance/terraform.tfstate"
   notification_lambda_arn = module.notification.function_arn
-  schedule_expression     = "cron(0 19 * * ? *)"  # 7pm UTC daily
+  schedule_expression     = "cron(0 19 * * ? *)" # 7pm UTC daily
   log_level               = "INFO"
   tags                    = local.common_tags
 }

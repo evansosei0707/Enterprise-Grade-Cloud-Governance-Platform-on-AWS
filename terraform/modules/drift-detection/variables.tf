@@ -26,7 +26,7 @@ variable "notification_lambda_arn" {
 variable "schedule_expression" {
   description = "EventBridge schedule expression for drift detection"
   type        = string
-  default     = "cron(0 19 * * ? *)"  # 7pm UTC daily
+  default     = "cron(0 19 * * ? *)" # 7pm UTC daily
 }
 
 variable "log_level" {

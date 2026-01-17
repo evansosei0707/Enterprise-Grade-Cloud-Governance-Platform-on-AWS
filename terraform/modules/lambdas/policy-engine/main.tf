@@ -23,12 +23,12 @@ resource "aws_lambda_function" "policy_engine" {
 
   environment {
     variables = {
-      DYNAMODB_TABLE        = var.dynamodb_table_name
-      EXCEPTIONS_TABLE      = var.exceptions_table_name
-      REMEDIATION_LAMBDA    = var.remediation_lambda_arn
-      NOTIFICATION_LAMBDA   = var.notification_lambda_arn
-      ENVIRONMENT           = var.environment
-      LOG_LEVEL             = var.log_level
+      DYNAMODB_TABLE      = var.dynamodb_table_name
+      EXCEPTIONS_TABLE    = var.exceptions_table_name
+      REMEDIATION_LAMBDA  = var.remediation_lambda_arn
+      NOTIFICATION_LAMBDA = var.notification_lambda_arn
+      ENVIRONMENT         = var.environment
+      LOG_LEVEL           = var.log_level
     }
   }
 

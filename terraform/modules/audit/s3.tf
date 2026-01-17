@@ -88,7 +88,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "audit" {
     }
 
     noncurrent_version_expiration {
-      noncurrent_days = 730  # 2 years
+      noncurrent_days = 730 # 2 years
     }
   }
 }
@@ -145,8 +145,8 @@ data "aws_iam_policy_document" "audit_bucket_policy" {
 
   # Enforce HTTPS only
   statement {
-    sid    = "DenyInsecureTransport"
-    effect = "Deny"
+    sid     = "DenyInsecureTransport"
+    effect  = "Deny"
     actions = ["s3:*"]
     resources = [
       aws_s3_bucket.audit.arn,
