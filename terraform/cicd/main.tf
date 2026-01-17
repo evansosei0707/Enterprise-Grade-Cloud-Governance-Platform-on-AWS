@@ -119,9 +119,11 @@ resource "aws_codebuild_project" "plan" {
             python: 3.11
           commands:
             - echo "Installing Terraform..."
+            - cd /tmp
             - wget -q https://releases.hashicorp.com/terraform/1.14.3/terraform_1.14.3_linux_amd64.zip
-            - unzip -o terraform_1.14.3_linux_amd64.zip
-            - mv terraform /usr/local/bin/
+            - unzip -o terraform_1.14.3_linux_amd64.zip -d terraform-bin
+            - mv terraform-bin/terraform /usr/local/bin/
+            - cd $CODEBUILD_SRC_DIR
             - terraform version
         pre_build:
           commands:
@@ -173,9 +175,11 @@ resource "aws_codebuild_project" "apply" {
             python: 3.11
           commands:
             - echo "Installing Terraform..."
+            - cd /tmp
             - wget -q https://releases.hashicorp.com/terraform/1.14.3/terraform_1.14.3_linux_amd64.zip
-            - unzip -o terraform_1.14.3_linux_amd64.zip
-            - mv terraform /usr/local/bin/
+            - unzip -o terraform_1.14.3_linux_amd64.zip -d terraform-bin
+            - mv terraform-bin/terraform /usr/local/bin/
+            - cd $CODEBUILD_SRC_DIR
             - terraform version
         pre_build:
           commands:
