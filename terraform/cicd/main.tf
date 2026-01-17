@@ -115,7 +115,13 @@ resource "aws_codebuild_project" "plan" {
       version: 0.2
       phases:
         install:
+          runtime-versions:
+            python: 3.11
           commands:
+            - echo "Installing Terraform..."
+            - wget -q https://releases.hashicorp.com/terraform/1.14.3/terraform_1.14.3_linux_amd64.zip
+            - unzip -o terraform_1.14.3_linux_amd64.zip
+            - mv terraform /usr/local/bin/
             - terraform version
         pre_build:
           commands:
@@ -163,7 +169,13 @@ resource "aws_codebuild_project" "apply" {
       version: 0.2
       phases:
         install:
+          runtime-versions:
+            python: 3.11
           commands:
+            - echo "Installing Terraform..."
+            - wget -q https://releases.hashicorp.com/terraform/1.14.3/terraform_1.14.3_linux_amd64.zip
+            - unzip -o terraform_1.14.3_linux_amd64.zip
+            - mv terraform /usr/local/bin/
             - terraform version
         pre_build:
           commands:
