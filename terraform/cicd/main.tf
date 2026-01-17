@@ -100,7 +100,7 @@ resource "aws_codebuild_project" "plan" {
 
   environment {
     compute_type = "BUILD_GENERAL1_SMALL"
-    image        = "hashicorp/terraform:1.14"
+    image        = "aws/codebuild/standard:7.0"
     type         = "LINUX_CONTAINER"
 
     environment_variable {
@@ -116,6 +116,9 @@ resource "aws_codebuild_project" "plan" {
       phases:
         install:
           commands:
+            - wget -O terraform.zip https://releases.hashicorp.com/terraform/1.14.3/terraform_1.14.3_linux_amd64.zip
+            - unzip terraform.zip
+            - mv terraform /usr/local/bin/
             - terraform version
         pre_build:
           commands:
@@ -148,7 +151,7 @@ resource "aws_codebuild_project" "apply" {
 
   environment {
     compute_type = "BUILD_GENERAL1_SMALL"
-    image        = "hashicorp/terraform:1.14"
+    image        = "aws/codebuild/standard:7.0"
     type         = "LINUX_CONTAINER"
 
     environment_variable {
@@ -162,6 +165,12 @@ resource "aws_codebuild_project" "apply" {
     buildspec = <<-EOF
       version: 0.2
       phases:
+        install:
+          commands:
+            - wget -O terraform.zip https://releases.hashicorp.com/terraform/1.14.3/terraform_1.14.3_linux_amd64.zip
+            - unzip terraform.zip
+            - mv terraform /usr/local/bin/
+            - terraform version
         pre_build:
           commands:
             - echo "Downloading terraform.tfvars from S3..."
