@@ -116,9 +116,6 @@ resource "aws_codebuild_project" "plan" {
       phases:
         install:
           commands:
-            - wget -O terraform.zip https://releases.hashicorp.com/terraform/1.14.3/terraform_1.14.3_linux_amd64.zip
-            - unzip terraform.zip
-            - mv terraform /usr/local/bin/
             - terraform version
         pre_build:
           commands:
@@ -167,9 +164,6 @@ resource "aws_codebuild_project" "apply" {
       phases:
         install:
           commands:
-            - wget -O terraform.zip https://releases.hashicorp.com/terraform/1.14.3/terraform_1.14.3_linux_amd64.zip
-            - unzip terraform.zip
-            - mv terraform /usr/local/bin/
             - terraform version
         pre_build:
           commands:
