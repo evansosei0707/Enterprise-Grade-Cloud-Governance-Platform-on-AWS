@@ -138,6 +138,7 @@ resource "aws_codebuild_project" "plan" {
         files:
           - terraform/environments/governance/tfplan
           - terraform/environments/governance/plan_output.txt
+          - terraform/environments/governance/.terraform.lock.hcl
     EOF
   }
 
