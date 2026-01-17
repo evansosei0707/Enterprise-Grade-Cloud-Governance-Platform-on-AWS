@@ -136,9 +136,9 @@ resource "aws_codebuild_project" "plan" {
             - terraform plan -out=tfplan -no-color | tee plan_output.txt
       artifacts:
         files:
-          - terraform/environments/governance/tfplan
-          - terraform/environments/governance/plan_output.txt
-          - terraform/environments/governance/.terraform.lock.hcl
+          - terraform/**/*
+          - '**/*.tf'
+          - '**/*.tfvars'
     EOF
   }
 
