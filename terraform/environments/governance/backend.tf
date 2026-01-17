@@ -5,6 +5,5 @@ terraform {
     region         = "us-east-1"
     encrypt        = true
     dynamodb_table = "cloud-governance-terraform-locks"
-    profile        = "governance"
   }
 }
