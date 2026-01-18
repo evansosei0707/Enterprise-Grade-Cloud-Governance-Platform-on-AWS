@@ -189,10 +189,10 @@ resource "aws_codebuild_project" "apply" {
         build:
           commands:
             - cd terraform/environments/governance
-            - echo "Running terraform init to download providers..."
+            - echo "Running terraform init..."
             - terraform init
-            - echo "Applying the plan..."
-            - terraform apply -auto-approve tfplan
+            - echo "Running terraform apply with auto-approve..."
+            - terraform apply -auto-approve
     EOF
   }
 
