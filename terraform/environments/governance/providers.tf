@@ -23,8 +23,7 @@ terraform {
 # Default Provider (Governance Account)
 # =============================================================================
 provider "aws" {
-  region  = var.primary_region
-  profile = "governance"
+  region = var.primary_region
 
   default_tags {
     tags = var.default_tags
@@ -35,9 +34,8 @@ provider "aws" {
 # Governance Account Provider (Explicit Alias)
 # =============================================================================
 provider "aws" {
-  alias   = "governance"
-  region  = var.primary_region
-  profile = "governance"
+  alias  = "governance"
+  region = var.primary_region
 
   default_tags {
     tags = var.default_tags
@@ -48,9 +46,8 @@ provider "aws" {
 # Dev Account Provider
 # =============================================================================
 provider "aws" {
-  alias   = "dev"
-  region  = var.primary_region
-  profile = "Dev"
+  alias  = "dev"
+  region = var.primary_region
 
   default_tags {
     tags = var.default_tags
@@ -61,9 +58,8 @@ provider "aws" {
 # Staging Account Provider
 # =============================================================================
 provider "aws" {
-  alias   = "staging"
-  region  = var.primary_region
-  profile = "Staging"
+  alias  = "staging"
+  region = var.primary_region
 
   default_tags {
     tags = var.default_tags
@@ -74,9 +70,8 @@ provider "aws" {
 # Prod Account Provider
 # =============================================================================
 provider "aws" {
-  alias   = "prod"
-  region  = var.primary_region
-  profile = "Prod"
+  alias  = "prod"
+  region = var.primary_region
 
   default_tags {
     tags = var.default_tags
